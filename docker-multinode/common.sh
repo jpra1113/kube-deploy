@@ -266,6 +266,7 @@ kube::multinode::start_k8s_worker_proxy() {
     gcr.io/google_containers/hyperkube-${ARCH}:${K8S_VERSION} \
     /hyperkube proxy \
         --master=http://${MASTER_IP}:8080 \
+        --masquerade-all \
         --v=2
 }
 
