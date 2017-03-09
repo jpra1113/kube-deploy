@@ -10,7 +10,7 @@ metadata:
     version: v8
     kubernetes.io/cluster-service: "true"
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     k8s-app: kube-dns
     version: v8
@@ -90,7 +90,7 @@ spec:
       volumes:
       - name: etcd-storage
         emptyDir: {}
-      dnsPolicy: Default  # Don't use cluster DNS.
+      dnsPolicy: ClusterFirst  # Don't use cluster DNS.
 ---
 apiVersion: v1
 kind: Service
