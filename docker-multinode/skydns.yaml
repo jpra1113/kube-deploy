@@ -3,22 +3,22 @@
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: kube-dns-v20
+  name: kube-dns-v8
   namespace: kube-system
   labels:
     k8s-app: kube-dns
-    version: v20
+    version: v8
     kubernetes.io/cluster-service: "true"
 spec:
   replicas: 2
   selector:
     k8s-app: kube-dns
-    version: v20
+    version: v8
   template:
     metadata:
       labels:
         k8s-app: kube-dns
-        version: v20
+        version: v8
         kubernetes.io/cluster-service: "true"
     spec:
       containers:
@@ -60,7 +60,7 @@ spec:
         # command = "/skydns"
         - -machines=http://localhost:4001
         - -addr=0.0.0.0:53
-        - -domain=cluster.local.
+        - -domain=cluster.local
         ports:
         - containerPort: 53
           name: dns
