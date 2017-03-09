@@ -57,6 +57,12 @@ kube::multinode::main(){
 
   DEFAULT_IP_ADDRESS=$(ip -o -4 addr list $(ip -o -4 route show to default | awk '{print $5}' | head -1) | awk '{print $4}' | cut -d/ -f1 | head -1)
   IP_ADDRESS=${IP_ADDRESS:-${DEFAULT_IP_ADDRESS}}
+  p1=$(echo $IP_ADDRESS | cut -d "." -f 1)
+  p2=$(echo $IP_ADDRESS | cut -d "." -f 2)
+  p3=$(echo $IP_ADDRESS | cut -d "." -f 3)
+  p4=$(echo $IP_ADDRESS | cut -d "." -f 4)
+
+  NODE_NAME=ip-$p1-$p2-$p3-$p4
 
   TIMEOUT_FOR_SERVICES=${TIMEOUT_FOR_SERVICES:-20}
   USE_CNI=${USE_CNI:-"false"}
@@ -217,7 +223,7 @@ kube::multinode::start_k8s_master() {
       --cluster-domain=cluster.local \
       ${CNI_ARGS} \
       ${CONTAINERIZED_FLAG} \
-      --hostname-override=${IP_ADDRESS} \
+      --hostname-override=${NODE_NAME} \
       --v=2
 }
 
@@ -244,7 +250,7 @@ kube::multinode::start_k8s_worker() {
       --cluster-domain=cluster.local \
       ${CNI_ARGS} \
       ${CONTAINERIZED_FLAG} \
-      --hostname-override=${IP_ADDRESS} \
+      --hostname-override=${NODE_NAME} \
       --v=2
 }
 
