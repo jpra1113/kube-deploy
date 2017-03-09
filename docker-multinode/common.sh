@@ -61,7 +61,6 @@ kube::multinode::main(){
   p2=$(echo $IP_ADDRESS | cut -d "." -f 2)
   p3=$(echo $IP_ADDRESS | cut -d "." -f 3)
   p4=$(echo $IP_ADDRESS | cut -d "." -f 4)
-
   NODE_NAME=ip-$p1-$p2-$p3-$p4
 
   TIMEOUT_FOR_SERVICES=${TIMEOUT_FOR_SERVICES:-20}
@@ -90,6 +89,7 @@ kube::multinode::main(){
     -v /run:/run:rw \
     -v /var/lib/docker:/var/lib/docker:rw \
     ${KUBELET_MOUNT} \
+    -v /etc/kubernetes:/etc/kubernetes:rw \
     -v /var/log/containers:/var/log/containers:rw"
 
   # Paths
@@ -103,12 +103,12 @@ kube::multinode::main(){
       --network-plugin=cni \
       --network-plugin-dir=/etc/cni/net.d"
   fi
+
+  kube::helpers::parse_version ${K8S_VERSION}
 }
 
 # Ensure everything is OK, docker is running and we're root
 kube::multinode::log_variables() {
-
-  kube::helpers::parse_version ${K8S_VERSION}
 
   # Output the value of the variables
   kube::log::status "K8S_VERSION is set to: ${K8S_VERSION}"
@@ -219,7 +219,7 @@ kube::multinode::start_k8s_master() {
       --allow-privileged \
       --api-servers=http://localhost:8080 \
       --config=/etc/kubernetes/manifests-multi \
-      --cluster-dns=10.0.0.10 \
+      --cluster-dns=172.31.0.10 \
       --cluster-domain=cluster.local \
       ${CNI_ARGS} \
       ${CONTAINERIZED_FLAG} \
@@ -246,7 +246,7 @@ kube::multinode::start_k8s_worker() {
     /hyperkube kubelet \
       --allow-privileged \
       --api-servers=http://${MASTER_IP}:8080 \
-      --cluster-dns=10.0.0.10 \
+      --cluster-dns=172.31.0.10 \
       --cluster-domain=cluster.local \
       ${CNI_ARGS} \
       ${CONTAINERIZED_FLAG} \
@@ -266,7 +266,6 @@ kube::multinode::start_k8s_worker_proxy() {
     gcr.io/google_containers/hyperkube-${ARCH}:${K8S_VERSION} \
     /hyperkube proxy \
         --master=http://${MASTER_IP}:8080 \
-        --masquerade-all \
         --v=2
 }
 
